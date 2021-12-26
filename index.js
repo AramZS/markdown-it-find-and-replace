@@ -11,37 +11,12 @@ module.exports = Plugin(/s11tys/g, (match, utils) => {
 
 // A nice reference on this - https://docs.joshuatz.com/cheatsheets/node-and-npm/markdown-it/
 
-const myWords = () => {
-	return [
-		{
-			pattern: /(?<=[\t\s\S\( ])11ty(?=[\?\.\,\s\r\n\!\) ])/gi,
-			replace: "Eleventy",
-		},
-		{
-			pattern: /(?<=[\t\s\( ])prob(?=[\?\.\,\s\r\n\!\) ])/gi,
-			replace: "probably",
-		},
-		{
-			pattern: /(?<=[\t\s\( ])graf(?=[\?\.\,\s\r\n\!\) ])/gi,
-			replace: "paragraph",
-		},
-		{
-			pattern: /(?<=[\t\s\( ])b\/c(?=[\?\.\,\s\r\n\!\) ])/gi,
-			replace: "because",
-		},
-		{
-			pattern: /(?<=[\t\s\( ])def(?=[\?\.\,\s\r\n\!\) ])/gi,
-			replace: "definitely",
-		},
-	];
-};
-
 const isInline = (token) => token && token.type === "inline";
-const hasMyWords = (token) => {
+const hasMyWords = (token, myWords) => {
 	if (token) {
 		// myWords().forEach((word) => {
-		for (let i = 0; i < myWords().length; i++) {
-			if (myWords()[i].pattern.test(token.content)) {
+		for (let i = 0; i < myWords.length; i++) {
+			if (myWords[i].pattern.test(token.content)) {
 				// console.log("Word Replacement Time");
 				return true;
 			}
@@ -61,11 +36,11 @@ function setAttr(token, name, value) {
 	}
 }
 
-function isMyWords(tokens, index) {
+function isMyWords(tokens, index, myWords) {
 	return (
 		isInline(tokens[index]) &&
 		// isParagraph(tokens[index - 1]) &&
-		hasMyWords(tokens[index])
+		hasMyWords(tokens[index], myWords)
 	);
 }
 
@@ -87,12 +62,12 @@ function fixMyWords(wordReplace, token, TokenConstructor) {
 	}
 }
 
-function fixWordify(token, TokenConstructor) {
+function fixWordify(token, TokenConstructor, myWords) {
 	// const { betterWord, wordChoice } = fixMyWords(token, TokenConstructor);
 	// token.children.unshift(betterWord);
 	if (!token || !token.content) return false;
 	//const sliceIndex = wordChoice.length;
-	const replaceMe = myWords();
+	const replaceMe = myWords;
 	try {
 		// console.log("Run Replacement.");
 		replaceMe.forEach((wordReplace) => {
@@ -134,44 +109,87 @@ function fixWordify(token, TokenConstructor) {
 	// console.log("token:", token);
 }
 
-module.exports = (md) => {
-	md.core.ruler.after("inline", "short-phrase-fixer", (state) => {
-		const tokens = state.tokens;
-		// console.log("Walking through possible words to fix3");
-		for (let i = 0; i < tokens.length; i++) {
-			if ((tokens, isMyWords(tokens, i))) {
-				// console.log("Trying to fix some words!");
-				fixWordify(tokens[i], state.Token);
-				setAttr(tokens[i - 1], "data-wordfix", "true");
+module.exports = (
+	md,
+	options = {
+		defaults: true,
+		replaceRules: [],
+	}
+) => {
+	if (options.defaults && !options.hasOwnProperty("replaceRules")) {
+		options.replaceRules = [];
+	}
+	if (!Array.isArray(options.replaceRules)) {
+		throw new Error(
+			"Markdown-It-Find-and-Replace requires that options.replaceRules be an array."
+		);
+	}
+	if (options.defaults) {
+		options.replaceRules.push(
+			...[
+				{
+					pattern: /(?<=[\t\s\S\( ])11ty(?=[\?\.\,\s\r\n\!\) ])/gi,
+					replace: "Eleventy",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])prob(?=[\?\.\,\s\r\n\!\) ])/g,
+					replace: "probably",
+				},
+				{
+					pattern: /(?<=[\t\s\( ]|^)Prob(?=[\?\.\,\s\r\n\!\) ])/g,
+					replace: "Probably",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])graf(?=[\?\.\,\s\r\n\!\) ])/gi,
+					replace: "paragraph",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])b\/c(?=[\?\.\,\s\r\n\!\) ])/gi,
+					replace: "because",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])def(?=[\?\.\,\s\r\n\!\) ])/gi,
+					replace: "definitely",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])tho(?=[\?\.\,\s\r\n\!\) ])/gi,
+					replace: "though",
+				},
+			]
+		);
+	}
+	if (options.replaceRules.length) {
+		options.replaceRules.forEach((wordRule) => {
+			if (
+				!wordRule.hasOwnProperty("pattern") ||
+				(!(wordRule.pattern instanceof RegExp) &&
+					!(typeof wordRule.pattern === "string"))
+			) {
+				console.log("Broken wordRule", wordRule);
+				throw new Error(
+					"Markdown-It-Find-and-Replace requires that patterns be `RegExp` or a string"
+				);
 			}
-		}
-	});
-};
-
-/**
-module.exports = (markdownSetup) => {
-	var defaultRender =
-		markdownSetup.renderer.rules.fix_my_words ||
-		function (tokens, idx, options, env, self) {
-			return self.renderToken(tokens, idx, options);
-		};
-	markdownSetup.renderer.rules.fix_my_words = function (
-		tokens,
-		idx,
-		options,
-		env,
-		self
-	) {
-		for (let i = 0; i < tokens.length; i++) {
-			if (isMyWords(tokens, i)) {
-				console.log("Trying to fix some words!");
-				fixWordify(tokens[i], tokens);
-				setAttr(tokens[i - 1], "data-wordfix", "true");
+			if (
+				!wordRule.hasOwnProperty("replace") ||
+				!(typeof wordRule.replace === "string")
+			) {
+				console.log("Broken wordRule", wordRule);
+				throw new Error(
+					"Markdown-It-Find-and-Replace requires that replace arguments be a string"
+				);
 			}
-		}
-
-		// pass token to default renderer.
-		return defaultRender(tokens, idx, options, env, self);
-	};
+		});
+		let myWords = options.replaceRules;
+		md.core.ruler.after("inline", "short-phrase-fixer", (state) => {
+			const tokens = state.tokens;
+			for (let i = 0; i < tokens.length; i++) {
+				if ((tokens, isMyWords(tokens, i, myWords))) {
+					// console.log("Trying to fix some words!");
+					fixWordify(tokens[i], state.Token, myWords);
+					setAttr(tokens[i - 1], "data-wordfix", "true");
+				}
+			}
+		});
+	}
 };
-*/

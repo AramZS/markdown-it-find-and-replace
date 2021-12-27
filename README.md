@@ -76,7 +76,7 @@ Markdown-It Find and Replace ships with a set of default rules that are intended
 ```js
 [
 	{
-		pattern: /(?<=[\t\s\S\( ])11ty(?=[\?\.\,\s\r\n\!\) ]|$)/gi,
+		pattern: /(?<=[\t\s\S\( ]|^)11ty(?=[\?\.\,\s\r\n\!\) ]|$)/gi,
 		replace: "Eleventy",
 	},
 	{
@@ -124,7 +124,7 @@ Markdown-It Find and Replace ships with a set of default rules that are intended
 
 ### HTML Data Property
 
-The plugin will add a data property named `wordfix` with a value of `true` to any plugins it treats. This is useful for debugging and verifying functionality.
+The plugin will add a data property named `wordfix` with a value of `true` to the HTML tag that contains text the plugins treats. This is useful for debugging and verifying functionality.
 
 ## Render Process Impact
 

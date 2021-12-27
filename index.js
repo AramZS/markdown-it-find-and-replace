@@ -3,7 +3,6 @@
 const isInline = (token) => token && token.type === "inline";
 const hasMyWords = (token, myWords) => {
 	if (token) {
-		// myWords().forEach((word) => {
 		for (let i = 0; i < myWords.length; i++) {
 			if (myWords[i].pattern.test(token.content)) {
 				// console.log("Word Replacement Time");
@@ -48,10 +47,7 @@ function fixMyWords(wordReplace, token, TokenConstructor) {
 }
 
 function fixWordify(token, TokenConstructor, myWords) {
-	// const { betterWord, wordChoice } = fixMyWords(token, TokenConstructor);
-	// token.children.unshift(betterWord);
 	if (!token || !token.content) return false;
-	//const sliceIndex = wordChoice.length;
 	const replaceMe = myWords;
 	try {
 		// console.log("Run Replacement.");
@@ -60,19 +56,6 @@ function fixWordify(token, TokenConstructor, myWords) {
 			for (let i = 0; i < token.children.length; i++) {
 				fixMyWords(wordReplace, token.children[i], TokenConstructor);
 			}
-			/**
-			const betterWord = new TokenConstructor("inline", "", 0);
-			const replaced = token.content.replace(
-				wordReplace.pattern,
-				wordReplace.replace
-			);
-			if (replaced) {
-				betterWord.content = replaced;
-				token.content = betterWord.content;
-				token.children[0].content = betterWord.content;
-			}
-			*/
-			// console.log("token:", token);
 		});
 	} catch (e) {
 		console.log(
@@ -83,15 +66,6 @@ function fixWordify(token, TokenConstructor, myWords) {
 		);
 		console.log(e);
 	}
-	//token.content = token.content.replace(wordChoice, betterWord.content);
-	//const fixedContent = new TokenConstructor("inline", "", 0);
-	//fixedContent.content = token.content;
-	// token.children[0].content = token.children[0].content.replace(
-	//	wordChoice,
-	//	betterWord.content
-	// );
-	// token.children[0].content = fixedContent.content;
-	// console.log("token:", token);
 }
 
 module.exports = (
@@ -113,7 +87,8 @@ module.exports = (
 		options.replaceRules.push(
 			...[
 				{
-					pattern: /(?<=[\t\s\S\( ])11ty(?=[\?\.\,\s\r\n\!\) ]|$)/gi,
+					pattern:
+						/(?<=[\t\s\S\( ]|^)11ty(?=[\?\.\,\s\r\n\!\) ]|$)/gi,
 					replace: "Eleventy",
 				},
 				{

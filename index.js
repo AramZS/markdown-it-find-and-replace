@@ -128,11 +128,11 @@ module.exports = (
 		options.replaceRules.push(
 			...[
 				{
-					pattern: /(?<=[\t\s\S\( ])11ty(?=[\?\.\,\s\r\n\!\) ])/gi,
+					pattern: /(?<=[\t\s\S\( ])11ty(?=[\?\.\,\s\r\n\!\) ]|$)/gi,
 					replace: "Eleventy",
 				},
 				{
-					pattern: /(?<=[\t\s\( ])prob(?=[\?\.\,\s\r\n\!\) ])/g,
+					pattern: /(?<=[\t\s\( ])prob(?=[\?\.\,\s\r\n\!\) ]|$)/g,
 					replace: "probably",
 				},
 				{
@@ -140,8 +140,12 @@ module.exports = (
 					replace: "Probably",
 				},
 				{
-					pattern: /(?<=[\t\s\( ])graf(?=[\?\.\,\s\r\n\!\) ])/gi,
+					pattern: /(?<=[\t\s\( ])graf(?=[\?\.\,\s\r\n\!\) ]|$)/g,
 					replace: "paragraph",
+				},
+				{
+					pattern: /(?<=[\t\s\( ]|^)Graf(?=[\?\.\,\s\r\n\!\) ])/g,
+					replace: "Paragraph",
 				},
 				{
 					pattern: /(?<=[\t\s\( ])b\/c(?=[\?\.\,\s\r\n\!\) ])/gi,

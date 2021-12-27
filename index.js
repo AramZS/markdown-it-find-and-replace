@@ -1,16 +1,5 @@
 "use strict";
 
-/**
-const Plugin = require("../markdown-it-regexp");
-
-module.exports = Plugin(/s11tys/g, (match, utils) => {
-	console.log("Markdown It shorthand match", match);
-	return String(` Eleventy `);
-});
- */
-
-// A nice reference on this - https://docs.joshuatz.com/cheatsheets/node-and-npm/markdown-it/
-
 const isInline = (token) => token && token.type === "inline";
 const hasMyWords = (token, myWords) => {
 	if (token) {
@@ -148,16 +137,28 @@ module.exports = (
 					replace: "Paragraph",
 				},
 				{
-					pattern: /(?<=[\t\s\( ])b\/c(?=[\?\.\,\s\r\n\!\) ])/gi,
+					pattern: /(?<=[\t\s\( ])b\/c(?=[\?\.\,\s\r\n\!\) ]|$)/g,
 					replace: "because",
 				},
 				{
-					pattern: /(?<=[\t\s\( ])def(?=[\?\.\,\s\r\n\!\) ])/gi,
+					pattern: /(?<=[\t\s\( ]|^)B\/c(?=[\?\.\,\s\r\n\!\) ])/g,
+					replace: "Because",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])def(?=[\?\.\,\s\r\n\!\) ]|$)/g,
 					replace: "definitely",
 				},
 				{
-					pattern: /(?<=[\t\s\( ])tho(?=[\?\.\,\s\r\n\!\) ])/gi,
+					pattern: /(?<=[\t\s\( ]|^)Def(?=[\?\.\,\s\r\n\!\) ])/g,
+					replace: "Definitely",
+				},
+				{
+					pattern: /(?<=[\t\s\( ])tho(?=[\?\.\,\s\r\n\!\) ]|$)/g,
 					replace: "though",
+				},
+				{
+					pattern: /(?<=[\t\s\( ]|^)Tho(?=[\?\.\,\s\r\n\!\) ])/g,
+					replace: "Though",
 				},
 			]
 		);

@@ -18,7 +18,7 @@
     "find-and-replace",
     "replace"
   ],
-  "author": "Aram Zucker-Scharff",
+  "author": "Aram Zucker-Scharff <aramzs@hacktext.com> (https://aramzs.github.io/aramzs/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/AramZS/markdown-it-find-and-replace/issues"

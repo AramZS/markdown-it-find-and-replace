@@ -26,11 +26,7 @@ function setAttr(token, name, value) {
 }
 
 function isMyWords(tokens, index, myWords) {
-	return (
-		isInline(tokens[index]) &&
-		// isParagraph(tokens[index - 1]) &&
-		hasMyWords(tokens[index], myWords)
-	);
+	return isInline(tokens[index]) && hasMyWords(tokens[index], myWords);
 }
 
 function fixMyWords(wordReplace, token, TokenConstructor) {
@@ -186,7 +182,7 @@ module.exports = (
 			}
 		});
 		let myWords = options.replaceRules;
-		md.core.ruler.after("inline", "short-phrase-fixer", (state) => {
+		md.core.ruler.after("inline", "find-and-replace", (state) => {
 			const tokens = state.tokens;
 			for (let i = 0; i < tokens.length; i++) {
 				if ((tokens, isMyWords(tokens, i, myWords))) {

@@ -1,6 +1,6 @@
 {
   "name": "markdown-it-find-and-replace",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Basic Find and Replace functionality for Markdown It via Regex. Great for build-process text expanders",
   "main": "index.js",
   "scripts": {
